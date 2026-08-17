@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="./catalog-data.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    :root {
+      --bg: #E7E1D0;
+      --surface: #DED5BE;
+      --surface-raised: #F1ECDD;
+      --border: rgba(34,31,26,0.13);
+      --border-strong: rgba(34,31,26,0.28);
+      --text-primary: #221F1A;
+      --text-secondary: #5B5548;
+      --text-tertiary: #8C8471;
+      --accent: #A6362A;
+      --accent-strong: #8A2A20;
+      --accent-text: #F5EEDD;
+      --font-display: Georgia, "Iowan Old Style", ui-serif, serif;
+      --font-body: "Avenir Next", "Century Gothic", "Segoe UI", sans-serif;
+      --font-mono: "SF Mono", "Courier New", monospace;
+    }
+    html, body { margin: 0; background: var(--bg); overflow-x: hidden; }
+    * { box-sizing: border-box; }
+    ::selection { background: rgba(166,54,42,0.25); color: var(--text-primary); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .tabs-row::-webkit-scrollbar { display: none; }
+    .search-input::placeholder { color: var(--text-tertiary); }
+    .search-input:focus-visible { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(166,54,42,0.18); }
+    .tab-btn:focus-visible, .back-btn:focus-visible, .whatsapp-btn:focus-visible, .whatsapp-fab:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 2px;
+    }
+    .selected-chip { position: relative; overflow: hidden; }
+    .selected-chip::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent 55%);
+    }
+
+    @media (max-width: 900px) {
+      .book-card { max-width: 620px !important; }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 24px 16px 100px !important; }
+      .header-bar { padding-bottom: 20px !important; gap: 14px !important; }
+      .header-left { gap: 12px !important; }
+      .logo-badge img { height: 46px !important; }
+      .header-title { font-size: 19px !important; }
+      .header-sub { font-size: 10.5px !important; margin-top: 4px !important; }
+      .search-wrap { width: 100% !important; }
+      .search-input { width: 100% !important; }
+      .tabs-row { overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; padding: 18px 0 10px !important; margin: 0 -16px !important; padding-left: 16px !important; padding-right: 16px !important; }
+      .tab-btn { flex: 0 0 auto; }
+      .book-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)) !important; gap: 14px !important; }
+      .card-img { height: 110px !important; }
+      .card-watermark { font-size: 44px !important; }
+      .card-body { padding: 12px 13px 14px !important; }
+      .card-name { font-size: 15px !important; }
+      .card-meta { font-size: 11.5px !important; }
+      .card-cta { font-size: 11px !important; }
+      .back-btn { top: 14px !important; left: 14px !important; padding: 9px 15px !important; font-size: 12px !important; }
+      .hero-bg-fixed { height: auto !important; bottom: auto !important; aspect-ratio: 4 / 5 !important; }
+      .hero-spacer { min-height: 125vw !important; padding: 84px 20px 30px !important; }
+      .book-title { font-size: 28px !important; }
+      .book-meta { font-size: 12.5px !important; }
+      .drape-cap { height: 26px !important; margin: -25px auto 0 !important; }
+      .book-card { margin-top: -1px !important; padding: 12px 20px 48px !important; }
+      .swatch-grid { gap: 8px !important; }
+      .selected-row { gap: 12px !important; margin-top: 20px !important; }
+      .selected-chip { width: 100% !important; height: 140px !important; }
+      .composition-grid { gap: 16px 16px !important; margin-top: 20px !important; }
+      .whatsapp-btn { padding: 13px !important; font-size: 14px !important; }
+      .whatsapp-fab { bottom: 16px !important; right: 16px !important; width: 50px !important; height: 50px !important; font-size: 22px !important; }
+    }
+
+    @media (max-width: 420px) {
+      .book-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important; gap: 10px !important; }
+      .swatch-grid { grid-template-columns: repeat(4, 1fr) !important; }
+      .composition-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); font-family: var(--font-body); color: var(--text-primary);">
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+
+    <div class="container" style="position: relative; max-width: 1280px; margin: 0 auto; padding: 40px 32px 140px;">
+
+      <div style="position: absolute; top: -70px; right: -60px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(166,54,42,0.13), transparent 72%); pointer-events: none; z-index: -1;"></div>
+
+      <div class="header-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding-bottom: 20px;">
+        <div class="header-left" style="display: flex; align-items: center; gap: 16px;">
+          <div class="logo-badge" style="display: flex; align-items: center;">
+            <img src="./assets/walters-logo.png" alt="Walters" style="height: 64px; width: auto; object-fit: contain; display: block;" />
+          </div>
+          <div>
+            <div class="header-title" style="font-family: var(--font-display); font-size: 26px; letter-spacing: 0.5px; color: var(--text-primary);">Smart Digital Catalog</div>
+            <div class="header-sub" style="font-size: 13px; color: var(--text-secondary); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;">20 Sample Books &nbsp;·&nbsp; 300 Colorways</div>
+          </div>
+        </div>
+        <div class="search-wrap" style="display: flex; align-items: center; gap: 10px;">
+          <input
+            type="text"
+            value="{{ query }}"
+            oninput="{{ onSearch }}"
+            placeholder="Search books or materials…"
+            class="search-input"
+            style="width: 280px; padding: 12px 16px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface-raised); font-family: var(--font-body); font-size: 14px; color: var(--text-primary); outline: none;"
+          />
+        </div>
+      </div>
+
+      <svg width="100%" height="16" viewBox="0 0 1200 16" preserveAspectRatio="none" style="display: block; margin: 0 0 4px;">
+        <path d="M0,9 Q150,1 300,8 T600,7 T900,9 T1200,6" fill="none" stroke="var(--text-tertiary)" stroke-width="1.3" stroke-dasharray="1.5 5" stroke-linecap="round" opacity="0.55"></path>
+      </svg>
+
+      <div class="tabs-row" style="display: flex; gap: 8px; padding: 20px 0 8px;">
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+          <button
+            onclick="{{ tab.onClick }}"
+            class="tab-btn"
+            style="padding: 9px 20px; border-radius: 999px; border: 1px solid {{ tab.borderColor }}; background: {{ tab.bg }}; color: {{ tab.color }}; font-weight: {{ tab.weight }}; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.3px; cursor: pointer; white-space: nowrap; box-shadow: {{ tab.shadow }}; transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(.22,.61,.36,1), border-color 0.2s ease;"
+            style-hover="{ borderColor: 'var(--accent)', transform: 'translateY(-1px)' }"
+          >{{ tab.label }}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showSofa }}" hint-placeholder-val="{{ true }}">
+        <div style="padding-top: 28px;">
+          <div style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px; color: var(--text-primary);">Sofa Upholstery</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">{{ sofaCountLabel }}</div>
+          <div class="book-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+            <sc-for list="{{ sofaBooks }}" as="book" hint-placeholder-count="12">
+              <div
+                onclick="{{ book.onClick }}"
+                style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 1px 1px rgba(34,31,26,0.05), 0 10px 20px -14px rgba(34,31,26,0.3); transition: box-shadow 0.35s cubic-bezier(.22,.61,.36,1), transform 0.35s cubic-bezier(.22,.61,.36,1), border-color 0.25s ease; animation: fadeUp 0.4s ease both;"
+                style-hover="{ boxShadow: '0 2px 3px rgba(34,31,26,0.08), 0 22px 34px -16px rgba(166,54,42,0.35)', transform: 'translateY(-4px)', borderColor: 'var(--accent)' }"
+              >
+                <div class="card-img" style="height: 160px; position: relative; background: {{ book.cardBg }}; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); overflow: hidden;">
+                  <sc-if value="{{ book.showWatermark }}" hint-placeholder-val="{{ true }}">
+                    <div class="card-watermark" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 64px; color: var(--text-primary); opacity: 0.06; pointer-events: none;">{{ book.initials }}</div>
+                  </sc-if>
+                  <sc-if value="{{ book.tag }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(20,18,14,0.7); border: 1px solid var(--border-strong); padding: 3px 9px; font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--accent-text);">{{ book.tag }}</div>
+                  </sc-if>
+                </div>
+                <div class="card-body" style="padding: 16px 18px 18px;">
+                  <div class="card-name" style="font-family: var(--font-display); font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">{{ book.name }}</div>
+                  <div class="card-meta" style="font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>{{ book.material }}</span>
+                    <span>{{ book.swatchCountLabel }}</span>
+                  </div>
+                  <div class="card-cta" style="font-size: 12px; letter-spacing: 0.4px; color: var(--accent-strong); display: flex; align-items: center; gap: 5px;">View Collection <span>→</span></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showCurtain }}" hint-placeholder-val="{{ true }}">
+        <div style="padding-top: 44px;">
+          <div style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px; color: var(--text-primary);">Curtains &amp; Drapery</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">{{ curtainCountLabel }}</div>
+          <div class="book-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+            <sc-for list="{{ curtainBooks }}" as="book" hint-placeholder-count="8">
+              <div
+                onclick="{{ book.onClick }}"
+                style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 1px 1px rgba(34,31,26,0.05), 0 10px 20px -14px rgba(34,31,26,0.3); transition: box-shadow 0.35s cubic-bezier(.22,.61,.36,1), transform 0.35s cubic-bezier(.22,.61,.36,1), border-color 0.25s ease; animation: fadeUp 0.4s ease both;"
+                style-hover="{ boxShadow: '0 2px 3px rgba(34,31,26,0.08), 0 22px 34px -16px rgba(166,54,42,0.35)', transform: 'translateY(-4px)', borderColor: 'var(--accent)' }"
+              >
+                <div class="card-img" style="height: 160px; position: relative; background: {{ book.cardBg }}; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); overflow: hidden;">
+                  <sc-if value="{{ book.showWatermark }}" hint-placeholder-val="{{ true }}">
+                    <div class="card-watermark" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 64px; color: var(--text-primary); opacity: 0.06; pointer-events: none;">{{ book.initials }}</div>
+                  </sc-if>
+                  <sc-if value="{{ book.tag }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(20,18,14,0.7); border: 1px solid var(--border-strong); padding: 3px 9px; font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--accent-text);">{{ book.tag }}</div>
+                  </sc-if>
+                </div>
+                <div class="card-body" style="padding: 16px 18px 18px;">
+                  <div class="card-name" style="font-family: var(--font-display); font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">{{ book.name }}</div>
+                  <div class="card-meta" style="font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>{{ book.material }}</span>
+                    <span>{{ book.swatchCountLabel }}</span>
+                  </div>
+                  <div class="card-cta" style="font-size: 12px; letter-spacing: 0.4px; color: var(--accent-strong); display: flex; align-items: center; gap: 5px;">View Collection <span>→</span></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 80px 0; text-align: center; color: var(--text-secondary); font-size: 15px;">No books match “{{ query }}”.</div>
+      </sc-if>
+
+    </div>
+
+  </sc-if>
+
+  <sc-if value="{{ isBook }}" hint-placeholder-val="{{ false }}">
+
+    <div class="hero-bg-fixed" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; overflow: hidden; background: var(--bg);">
+      <image-slot id="app-{{ book.id }}" shape="rect" fit="cover" placeholder="{{ book.appPlaceholder }}" src="{{ book.heroImage }}" style="width: 100%; height: 100%; display: block;"></image-slot>
+      <div class="hero-scrim" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,13,10,0.55) 0%, rgba(15,13,10,0.12) 28%, rgba(15,13,10,0.30) 58%, rgba(15,13,10,0.88) 100%); pointer-events: none;"></div>
+    </div>
+
+    <button
+      onclick="{{ goHome }}"
+      class="back-btn"
+      style="position: fixed; top: 24px; left: 24px; z-index: 20; display: flex; align-items: center; gap: 8px; background: rgba(20,18,14,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.18); padding: 11px 20px; border-radius: 999px; font-family: var(--font-body); font-size: 13px; letter-spacing: 0.3px; color: #fff; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.35); white-space: nowrap; transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s cubic-bezier(.22,.61,.36,1);"
+      style-hover="{ borderColor: 'var(--accent)', background: 'rgba(20,18,14,0.75)', transform: 'translateY(-1px)' }"
+    >← Back to All Books</button>
+
+    <div class="book-scroll" style="position: relative; z-index: 1;">
+
+      <div class="hero-spacer" style="min-height: 88vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 108px 48px 44px; animation: fadeUp 0.5s ease both;">
+        <div class="hero-tag" style="display: inline-flex; align-self: flex-start; background: rgba(20,18,14,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.16); padding: 6px 14px; border-radius: 999px; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-text); margin-bottom: 16px;">{{ book.appLabel }}</div>
+        <div class="book-title" style="font-family: var(--font-display); font-size: 44px; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.55); line-height: 1.05;">{{ book.name }}</div>
+        <div class="book-meta" style="font-size: 14px; color: rgba(255,255,255,0.82); margin-top: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">{{ book.material }} &nbsp;·&nbsp; {{ book.category }} &nbsp;·&nbsp; {{ book.swatchCountLabel }}</div>
+      </div>
+
+      <svg class="drape-cap" viewBox="0 0 600 34" preserveAspectRatio="none" style="display: block; width: 100%; max-width: 720px; height: 34px; margin: -33px auto 0; position: relative; z-index: 1;">
+        <path d="M0,34 L0,18 C 50,2 100,2 140,16 C 185,32 235,32 280,14 C 320,-1 370,-1 410,15 C 455,32 505,32 550,14 C 570,7 585,6 600,10 L600,34 Z" fill="var(--surface)"></path>
+      </svg>
+
+      <div class="book-card" style="background: var(--surface); margin-top: -1px; max-width: 720px; margin-left: auto; margin-right: auto; padding: 12px 44px 64px; box-shadow: 0 -24px 60px rgba(0,0,0,0.25); animation: fadeUp 0.6s ease both;">
+
+        <div style="font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-secondary); margin-top: 20px; margin-bottom: 14px;">Colorways</div>
+        <sc-if value="{{ book.hasPriceLine }}" hint-placeholder-val="{{ false }}">
+          <div style="background: var(--text-primary); color: var(--accent-text); font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.3px; padding: 12px 16px; border-radius: 10px; margin-top: -8px; margin-bottom: 14px; box-shadow: 0 1px 1px rgba(34,31,26,0.1), 0 10px 20px -12px rgba(34,31,26,0.5);">{{ book.priceLine }}</div>
+        </sc-if>
+        <div class="swatch-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+          <sc-for list="{{ book.swatches }}" as="sw" hint-placeholder-count="15">
+            <div
+              onclick="{{ sw.onClick }}"
+              title="{{ sw.name }}"
+              style="aspect-ratio: 1; background: {{ sw.background }}; cursor: pointer; border-radius: 8px; border: 2px solid {{ sw.borderColor }}; box-shadow: {{ sw.shadow }}; position: relative; transition: transform 0.25s cubic-bezier(.22,.61,.36,1);"
+              style-hover="{ transform: 'translateY(-2px) scale(1.05)' }"
+            ></div>
+          </sc-for>
+        </div>
+
+        <svg width="100%" height="14" viewBox="0 0 600 14" preserveAspectRatio="none" style="display: block; margin: 28px 0;">
+          <path d="M0,7 Q75,1 150,6 T300,6 T450,7 T600,5" fill="none" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-dasharray="1.4 4.5" stroke-linecap="round" opacity="0.5"></path>
+        </svg>
+
+        <div class="selected-row" style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="selected-chip" style="width: 100%; height: 220px; border-radius: 14px; background: {{ selected.background }}; border: 1px solid rgba(34,31,26,0.15); box-shadow: 0 1px 1px rgba(34,31,26,0.08), 0 16px 28px -14px rgba(34,31,26,0.35);"></div>
+          <div style="min-width: 0;">
+            <div style="font-family: var(--font-display); font-size: 21px; color: var(--text-primary);">{{ selected.name }}</div>
+            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 4px;">Code: {{ selected.code }}</div>
+            <sc-if value="{{ selected.hasPrice }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 16px; color: var(--accent-strong); font-weight: 600; margin-top: 8px;">{{ selected.priceValue }}</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div class="composition-grid" style="margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 28px;">
+          <div>
+            <div style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">Composition</div>
+            <div style="font-size: 14px; color: var(--text-primary);">{{ book.composition }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">{{ selected.gsmLabel }}</div>
+            <div style="font-size: 14px; color: var(--text-primary);">{{ selected.gsmValue }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">Application</div>
+            <div style="font-size: 14px; color: var(--text-primary);">{{ book.application }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">Care</div>
+            <div style="font-size: 14px; color: var(--text-primary);">{{ book.care }}</div>
+          </div>
+        </div>
+
+        <button
+          onclick="{{ onWhatsApp }}"
+          class="whatsapp-btn"
+          style="margin-top: 30px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: #fff; border: none; padding: 15px; font-family: var(--font-body); font-size: 15px; font-weight: 500; cursor: pointer; border-radius: 999px; box-shadow: 0 1px 1px rgba(34,31,26,0.12), 0 14px 26px -10px rgba(37,211,102,0.4); transition: background 0.2s ease, transform 0.28s cubic-bezier(.22,.61,.36,1), box-shadow 0.28s cubic-bezier(.22,.61,.36,1);"
+          style-hover="{ background: '#1fb959', transform: 'translateY(-2px)', boxShadow: '0 2px 3px rgba(34,31,26,0.14), 0 20px 32px -12px rgba(37,211,102,0.5)' }"
+        >
+          <span style="font-size: 17px;">☎</span> Inquire about this Swatch on WhatsApp
+        </button>
+
+      </div>
+
+    </div>
+
+  </sc-if>
+
+  <button
+    onclick="{{ onWhatsAppGeneral }}"
+    title="Chat with us on WhatsApp"
+    class="whatsapp-fab"
+    style="position: fixed; bottom: 24px; right: 24px; z-index: 30; width: 58px; height: 58px; border-radius: 50%; background: #25D366; border: none; color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 1px rgba(34,31,26,0.15), 0 12px 26px -8px rgba(37,211,102,0.5); transition: transform 0.25s cubic-bezier(.22,.61,.36,1), box-shadow 0.25s ease;"
+    style-hover="{ transform: 'translateY(-2px) scale(1.06)', boxShadow: '0 2px 2px rgba(34,31,26,0.18), 0 18px 32px -10px rgba(37,211,102,0.55)' }"
+  >☎</button>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function bookIdFromUrl() {
+  const id = new URLSearchParams(window.location.search).get('book');
+  const data = window.CATALOG_DATA || [];
+  return id && data.some(b => b.id === id) ? id : null;
+}
+
+class Component extends DCLogic {
+  state = (() => {
+    const bookId = bookIdFromUrl();
+    return bookId
+      ? { view: 'book', query: '', category: 'all', bookId, swatchIndex: 0 }
+      : { view: 'home', query: '', category: 'all', bookId: null, swatchIndex: 0 };
+  })();
+
+  componentDidMount() {
+    this.onPopState = () => {
+      const bookId = bookIdFromUrl();
+      this.setState(bookId
+        ? { view: 'book', bookId, swatchIndex: 0 }
+        : { view: 'home', bookId: null });
+    };
+    window.addEventListener('popstate', this.onPopState);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('popstate', this.onPopState);
+  }
+
+  goHome = () => {
+    this.setState({ view: 'home' });
+    history.pushState({}, '', window.location.pathname);
+  };
+  openBook = (id) => {
+    this.setState({ view: 'book', bookId: id, swatchIndex: 0 });
+    history.pushState({}, '', `${window.location.pathname}?book=${encodeURIComponent(id)}`);
+  };
+  onSearch = (e) => this.setState({ query: e.target.value });
+  setCategory = (c) => this.setState({ category: c });
+  selectSwatch = (i) => this.setState({ swatchIndex: i });
+
+  onWhatsApp = () => {
+    const data = window.CATALOG_DATA || [];
+    const book = data.find(b => b.id === this.state.bookId);
+    if (!book) return;
+    const sw = book.swatches[this.state.swatchIndex];
+    const priceNote = sw.price ? ` Listed price: ₹${sw.price}/meter.` : '';
+    const msg = `Hi, I am interested in the ${book.name} collection, Swatch: ${sw.name} (Code: ${sw.code}).${priceNote} Please share pricing and availability.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  onWhatsAppGeneral = () => {
+    const msg = `Hi, I'd like some guidance choosing a fabric from the Walters catalog. Could you help?`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  buildCard(b) {
+    const first = b.swatches[0].hex;
+    const hero = b.heroImage;
+    return {
+      id: b.id, name: b.name, material: b.material, tag: b.tag,
+      swatchCountLabel: `${b.swatches.length} Colors`,
+      hex: first, initials: initials(b.name),
+      showWatermark: !hero,
+      cardBg: hero
+        ? `url('${hero}') center/cover no-repeat`
+        : `repeating-linear-gradient(45deg, var(--surface-raised) 0 3px, var(--surface) 3px 6px)`,
+      onClick: () => this.openBook(b.id)
+    };
+  }
+
+  renderVals() {
+    const data = window.CATALOG_DATA || [];
+    const q = this.state.query.trim().toLowerCase();
+    const cat = this.state.category;
+
+    const matches = (b) => {
+      const passQ = !q || b.name.toLowerCase().includes(q) || b.material.toLowerCase().includes(q);
+      const passCat = cat === 'all' || (cat === 'sofa' && b.category === 'Sofa Upholstery') || (cat === 'curtain' && b.category === 'Curtains & Drapery');
+      return passQ && passCat;
+    };
+
+    const sofa = data.filter(b => b.category === 'Sofa Upholstery' && matches(b));
+    const curtain = data.filter(b => b.category === 'Curtains & Drapery' && matches(b));
+
+    const tabDefs = [
+      { label: 'All Books', value: 'all' },
+      { label: 'Sofa Upholstery', value: 'sofa' },
+      { label: 'Curtains & Drapery', value: 'curtain' }
+    ];
+    const tabs = tabDefs.map(t => {
+      const active = cat === t.value;
+      return {
+        label: t.label,
+        onClick: () => this.setCategory(t.value),
+        bg: active ? 'var(--accent)' : 'var(--surface)',
+        color: active ? 'var(--accent-text)' : 'var(--text-secondary)',
+        borderColor: active ? 'var(--accent)' : 'var(--border-strong)',
+        weight: active ? '600' : '400',
+        shadow: active ? 'inset 0 1px 3px rgba(34,31,26,0.3)' : 'none'
+      };
+    });
+
+    let bookVal = null, selected = null;
+    if (this.state.view === 'book' && this.state.bookId) {
+      const raw = data.find(b => b.id === this.state.bookId);
+      if (raw) {
+        const swatches = raw.swatches.map((sw, i) => {
+          const active = i === this.state.swatchIndex;
+          return {
+            ...sw,
+            background: sw.img ? `url('${sw.img}') center/cover no-repeat, ${sw.hex}` : sw.hex,
+            borderColor: active ? 'var(--accent)' : 'rgba(34,31,26,0.14)',
+            shadow: active ? '0 0 0 3px var(--surface), 0 6px 14px rgba(34,31,26,0.35)' : 'none',
+            onClick: () => this.selectSwatch(i)
+          };
+        });
+        const isSofa = raw.category === 'Sofa Upholstery';
+        bookVal = {
+          ...raw,
+          swatchCountLabel: `${raw.swatches.length} Colors`,
+          swatches,
+          appLabel: isSofa ? 'Sofa Application' : 'Curtain Application',
+          appPlaceholder: isSofa ? `Drop a photo of a sofa upholstered in ${raw.name}` : `Drop a photo of curtains in ${raw.name}`,
+          heroImage: raw.heroImage || './assets/fabric-application-placeholder.jpg',
+          hasPriceLine: !!raw.mrp,
+          priceLine: raw.mrp ? `MRP ₹${raw.mrp} / meter · Width ${raw.widthCm} cm · GST ${raw.gstRate}% · HSN ${raw.hsnCode}` : ''
+        };
+        const rawSelected = swatches[this.state.swatchIndex];
+        selected = rawSelected && {
+          ...rawSelected,
+          gsmLabel: rawSelected.gsmLabel || raw.rubLabel,
+          gsmValue: rawSelected.gsm || raw.rub,
+          hasPrice: !!rawSelected.price,
+          priceValue: rawSelected.price ? `₹${rawSelected.price} / meter` : ''
+        };
+      }
+    }
+
+    return {
+      isHome: this.state.view === 'home',
+      isBook: this.state.view === 'book',
+      query: this.state.query,
+      onSearch: this.onSearch,
+      tabs,
+      showSofa: (cat === 'all' || cat === 'sofa') && sofa.length > 0,
+      showCurtain: (cat === 'all' || cat === 'curtain') && curtain.length > 0,
+      sofaCountLabel: `${sofa.length} Books`,
+      curtainCountLabel: `${curtain.length} Books`,
+      sofaBooks: sofa.map(b => this.buildCard(b)),
+      curtainBooks: curtain.map(b => this.buildCard(b)),
+      noResults: sofa.length === 0 && curtain.length === 0,
+      book: bookVal,
+      selected,
+      goHome: this.goHome,
+      onWhatsApp: this.onWhatsApp,
+      onWhatsAppGeneral: this.onWhatsAppGeneral
+    };
+  }
+}
+
+</script>
+</body>
+</html>
